@@ -28,7 +28,7 @@ def register(data):
 def login(data):
     try:
         user = User.query.filter_by(email=data['email']).first()
-        print(user.email)
+        #print(user.email)
         if user:
             payload = {"email": user.email, "user_id": str(user.id),"name":user.username}
             if compare_passwords(str(data['password']), str(user.password)):

@@ -6,6 +6,7 @@ from utils.JwtToken import validate_token_admin
 
 
 @user_route.route("/api/v1/user/register", methods=['POST'])
+
 def register():
     data = request.get_json()
     return user_services.register(data)
