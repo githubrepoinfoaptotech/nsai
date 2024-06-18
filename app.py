@@ -20,6 +20,7 @@ def before_request():
 
 with app.app_context():
     from model.User import User
+    
     db.create_all()
     db.session.commit()
 

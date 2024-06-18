@@ -36,12 +36,10 @@ def login(data):
                 token = generate_token(payload, secret)
                 return make_response({'token': token,"status":True}, 200)
             else:
-                return make_response({'message': 'Invalid password',"status":False}, 403)
-            
-            
+                return make_response({'message': 'Invalid password',"status":False}, 403)      
         else:
         # Add Operation
-            return make_response({'message': "User Not Found","status":True}, 200)   
+            return make_response({'message': "User Not Found","status":False}, 200)   
     except Exception as e:
         return make_response({'message': str(e)}, 404) 
     
