@@ -1,21 +1,35 @@
+from datetime import datetime
+
 from database import db
-import uuid
-from sqlalchemy.orm import validates
+from sqlalchemy import Column, String, Uuid
+from uuid import uuid4
+from sqlalchemy import event
+from werkzeug.security import generate_password_hash
+from sqlalchemy import Integer, String, DateTime,Boolean
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+
+
 class User(db.Model):
-    id = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
-    username = db.Column(db.String(80))
-    email = db.Column(db.String(120), unique=True)
-    password = db.Column(db.Text())
+    __tablename__ = "users"
 
-    @validates('password')
-    def validate_password(self, key, password):
-            if len(password) < 8:
-                raise ValueError('Password must be at least 8 characters long.')
-            return password
-    def __init__(self, username, email , password):
-        self.username = username
-        self.email = email
-        self.password= password
+    id: Mapped[str] = mapped_column(type_=Uuid, primary_key=True, default=uuid4)
+    email: Mapped[str] = mapped_column(type_=String(250), unique=True, nullable=False)
+    password: Mapped[str] = mapped_column(type_=String(250), nullable=False)
+    fullname: Mapped[str] = mapped_column(type_=String(250), nullable=False)
+    createdAt = mapped_column(type_=DateTime, default=datetime.utcnow)
+    updatedAt = mapped_column(type_=DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
-    def __repr__(self):
-        return '<User %r>' % self.username
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "email": self.email,
+            "password": self.password,
+            "fullname": self.fullname
+        }
+
+
+@event.listens_for(User, "before_insert")
+def hash_password(mapper, connect, target):
+    if target.password:
+        target.password = generate_password_hash(target.password, method="pbkdf2:sha256", salt_length=18)
+

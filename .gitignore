@@ -1,3 +1,4 @@
 .env
 nsaienv
 _pycache_
+*.pyc

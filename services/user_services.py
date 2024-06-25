@@ -1,7 +1,7 @@
 from model.User import User
 from utils.passwordEncryption import encrypt_password, compare_passwords
 from utils.JwtToken import generate_token
-
+from werkzeug.security import check_password_hash
 from flask import jsonify, make_response,Flask, render_template, request,session
 import os
 import datetime
@@ -17,7 +17,7 @@ def register(data):
             return make_response({'message': "User Already Exist","status":True}, 200)
         else:
         # Add Operation
-            new_user = User(username=data['username'], email=data['email'], password=encrypt_password(data['password']))
+            new_user = User(fullname=data['fullname'], email=data['email'], password=data['password'])
             db.session.add(new_user)
             db.session.commit()
             return make_response({'message': "User Added Successfully","status":True}, 200)
@@ -31,7 +31,7 @@ def login(data):
         #print(user.email)
         if user:
             payload = {"email": user.email, "user_id": str(user.id),"name":user.username}
-            if compare_passwords(str(data['password']), str(user.password)):
+            if check_password_hash(user["password"], data["password"]):
                 secret = os.environ.get('TOKEN_SECRET')
                 token = generate_token(payload, secret)
                 return make_response({'token': token,"status":True}, 200)
